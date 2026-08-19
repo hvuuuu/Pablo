@@ -1,26 +1,404 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================================
+   Pablo Card Game — Casino Dark Theme
+   ============================================================================ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: #0a0e17;
+  --color-foreground: #e8edf5;
+  --color-card: #121a2b;
+  --color-card-foreground: #e8edf5;
+  --color-popover: #121a2b;
+  --color-popover-foreground: #e8edf5;
+  --color-primary: #10b981;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #e8edf5;
+  --color-muted: #1a2236;
+  --color-muted-foreground: #7b8ba5;
+  --color-accent: #f59e0b;
+  --color-accent-foreground: #0a0e17;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #1e3a4f;
+  --color-input: #1e3a4f;
+  --color-ring: #10b981;
+  --color-chart-1: #10b981;
+  --color-chart-2: #3b82f6;
+  --color-chart-3: #f59e0b;
+  --color-chart-4: #ef4444;
+  --color-chart-5: #8b5cf6;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Game-specific colors */
+  --color-table: #0d3320;
+  --color-table-felt: #145a38;
+  --color-table-border: #1a7a4c;
+  --color-card-red: #ef4444;
+  --color-card-black: #cbd5e1;
+  --color-card-back: #1e3a5f;
+  --color-card-back-pattern: #2a4f7a;
+  --color-gold: #f59e0b;
+  --color-gold-light: #fbbf24;
+  --color-gold-dark: #d97706;
+  --color-emerald-glow: #10b981;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  overflow-x: hidden;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/* ============================================================================
+   Card Flip Animation (CSS 3D Transform)
+   ============================================================================ */
+
+.card-container {
+  perspective: 800px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 0.5rem;
+}
+
+.card-back {
+  transform: rotateY(0deg);
+}
+
+.card-front {
+  transform: rotateY(180deg);
+}
+
+/* ============================================================================
+   Glow Effects
+   ============================================================================ */
+
+.glow-emerald {
+  box-shadow:
+    0 0 15px rgba(16, 185, 129, 0.4),
+    0 0 30px rgba(16, 185, 129, 0.2),
+    0 0 60px rgba(16, 185, 129, 0.1);
+}
+
+.glow-gold {
+  box-shadow:
+    0 0 15px rgba(245, 158, 11, 0.5),
+    0 0 30px rgba(245, 158, 11, 0.3),
+    0 0 60px rgba(245, 158, 11, 0.15);
+}
+
+.glow-gold-pulse {
+  box-shadow:
+    0 0 0 3px rgba(250, 204, 21, 0.9),
+    0 0 20px rgba(250, 204, 21, 0.6),
+    0 0 40px rgba(250, 204, 21, 0.3);
+  animation: gold-pulse-ring 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes gold-pulse-ring {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(250, 204, 21, 0.9),
+      0 0 20px rgba(250, 204, 21, 0.6),
+      0 0 35px rgba(250, 204, 21, 0.25);
+    transform: scale(1.03);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(250, 204, 21, 1),
+      0 0 30px rgba(250, 204, 21, 0.85),
+      0 0 50px rgba(250, 204, 21, 0.4);
+    transform: scale(1.06);
+  }
+}
+
+.card-highlight-gold {
+  animation: gold-pulse-ring 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  border-radius: 0.5rem;
+  z-index: 10;
+}
+
+.glow-red {
+  box-shadow:
+    0 0 15px rgba(239, 68, 68, 0.4),
+    0 0 30px rgba(239, 68, 68, 0.2);
+}
+
+.glow-blue {
+  box-shadow:
+    0 0 12px rgba(59, 130, 246, 0.4),
+    0 0 24px rgba(59, 130, 246, 0.2);
+}
+
+/* ============================================================================
+   Pablo Button Pulse Animation
+   ============================================================================ */
+
+@keyframes pablo-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 15px rgba(245, 158, 11, 0.5),
+      0 0 30px rgba(245, 158, 11, 0.3),
+      0 0 60px rgba(245, 158, 11, 0.15);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(245, 158, 11, 0.7),
+      0 0 50px rgba(245, 158, 11, 0.4),
+      0 0 80px rgba(245, 158, 11, 0.2);
+    transform: scale(1.03);
+  }
+}
+
+.pablo-button-active {
+  animation: pablo-pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   Turn Indicator Ring
+   ============================================================================ */
+
+@keyframes turn-ring {
+  0% {
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    border-color: rgba(16, 185, 129, 0.9);
+  }
+  100% {
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+}
+
+.turn-ring {
+  animation: turn-ring 1.5s ease-in-out infinite;
+}
+
+/* ============================================================================
+   Card Hover Effects
+   ============================================================================ */
+
+.card-hoverable {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.card-hoverable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.card-selected {
+  transform: translateY(-8px);
+  box-shadow:
+    0 0 20px rgba(16, 185, 129, 0.5),
+    0 0 40px rgba(16, 185, 129, 0.25);
+  border: 2px solid rgba(16, 185, 129, 0.8);
+}
+
+/* ============================================================================
+   Table Felt Texture
+   ============================================================================ */
+
+.table-felt {
+  background: radial-gradient(
+    ellipse at center,
+    #145a38 0%,
+    #0d3320 60%,
+    #091a12 100%
+  );
+  position: relative;
+}
+
+.table-felt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ============================================================================
+   Card Back Pattern
+   ============================================================================ */
+
+.card-back-pattern {
+  background:
+    linear-gradient(135deg, #1e3a5f 25%, transparent 25%) -10px 0,
+    linear-gradient(225deg, #1e3a5f 25%, transparent 25%) -10px 0,
+    linear-gradient(315deg, #1e3a5f 25%, transparent 25%),
+    linear-gradient(45deg, #1e3a5f 25%, transparent 25%);
+  background-size: 20px 20px;
+  background-color: #162d4a;
+}
+
+/* ============================================================================
+   Custom Scrollbar
+   ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+/* ============================================================================
+   Shimmer / Loading Effect
+   ============================================================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================================================
+   Confetti / Celebration
+   ============================================================================ */
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  animation: confetti-fall linear forwards;
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* ============================================================================
+   Timer Bar
+   ============================================================================ */
+
+@keyframes timer-drain {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.timer-bar {
+  animation: timer-drain linear forwards;
+}
+
+/* ============================================================================
+   Responsive Card Sizing
+   ============================================================================ */
+
+.card-size-sm {
+  width: 48px;
+  height: 68px;
+}
+
+.card-size-md {
+  width: 64px;
+  height: 90px;
+}
+
+.card-size-lg {
+  width: 80px;
+  height: 112px;
+}
+
+@media (min-width: 768px) {
+  .card-size-sm {
+    width: 56px;
+    height: 78px;
+  }
+  .card-size-md {
+    width: 72px;
+    height: 100px;
+  }
+  .card-size-lg {
+    width: 96px;
+    height: 134px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-size-lg {
+    width: 104px;
+    height: 146px;
+  }
 }
